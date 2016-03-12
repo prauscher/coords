@@ -17,6 +17,8 @@ class MapReference:
     def __init__(self, A, B):
         self.A = A
         self.B = B
+        # filled by orientate
+        self.angle = 0
         self.boundingbox = [(0,0), (0,0), (0,0), (0,0)]
         self.R = np.asarray([[1,0], [0,1]])
 
@@ -67,18 +69,22 @@ class MapReference:
         x2 = min_x[best_idx]
         y2 = min_y[best_idx]
         r = rotations[best_idx]
+        angle = angles[best_idx]
 
-        self.rotate(r)
+        self.angle = angle
+        self.R = r.T
         self.boundingbox = [np.dot([x1, y2], r), np.dot([x1, y1], r), np.dot([x2, y1], r), np.dot([x2, y2], r)]
 
         if self.max_height() > self.max_width():
             # rotate by 90 degress
-            self.rotate(np.asarray([[0, -1], [1, 0]]))
+            self.angle -= np.pi/2
+            self.R = np.dot(self.R, np.asarray([[0, -1], [1, 0]]).T)
             self.boundingbox = [self.boundingbox[3], self.boundingbox[0], self.boundingbox[1], self.boundingbox[2]]
 
         if self.get_north() > 90 and self.get_north() < 270:
             # rotate by 180 degress
-            self.rotate(np.asarray([[-1, 0], [0, -1]]))
+            self.angle -= np.pi
+            self.R = np.dot(self.R, np.asarray([[-1, 0], [0, -1]]).T)
             self.boundingbox = [self.boundingbox[2], self.boundingbox[3], self.boundingbox[0], self.boundingbox[1]]
 
     def max_width(self):
@@ -92,13 +98,9 @@ class MapReference:
     def get_north(self):
         # TODO
         assert(self.A.lat == self.B.lat)
-#        print(np.degrees(np.arcsin(np.linalg.norm((self.boundingbox[2][0], self.boundingbox[1][1]) - self.boundingbox[1]) / self.max_width())) - 90 - -1 * np.degrees(np.arccos(self.R[0,0])))
+        return -1 * np.degrees(self.angle)
 #        return np.degrees(np.arcsin(np.linalg.norm((self.boundingbox[2][0], self.boundingbox[1][1]) - self.boundingbox[1]) / self.max_width())) - 90
-        return -1 * np.degrees(np.arccos(self.R[0,0]))
-
-    def rotate(self, R):
-#        self.boundingbox = np.dot(self.boundingbox, R.T)
-        self.R = np.dot(self.R, R.T)
+#        return -1 * np.degrees(np.arccos(self.R[0,0]))
 
     def get_xy(self, C):
         a = self.B.distance(C)
