@@ -81,10 +81,12 @@ class MapReference:
         self.boundingbox = [np.dot([x1, y2], r), np.dot([x1, y1], r), np.dot([x2, y1], r), np.dot([x2, y2], r)]
 
         if self.max_height() > self.max_width():
-            self.rotate(np.asarray([[0, 1], [1, 0]]))
-            self.boundingbox = [self.boundingbox[1], self.boundingbox[2], self.boundingbox[3], self.boundingbox[0]]
+            # rotate by 90 degress
+            self.rotate(np.asarray([[0, -1], [1, 0]]))
+            self.boundingbox = [self.boundingbox[3], self.boundingbox[0], self.boundingbox[1], self.boundingbox[2]]
 
         if self.get_north() > 90 and self.get_north() < 270:
+            # rotate by 180 degress
             self.rotate(np.asarray([[-1, 0], [0, -1]]))
             self.boundingbox = [self.boundingbox[2], self.boundingbox[3], self.boundingbox[0], self.boundingbox[1]]
 
