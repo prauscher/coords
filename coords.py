@@ -21,15 +21,6 @@ class MapReference:
         self.R = np.asarray([[1,0], [0,1]])
 
     def orientate(self, points_plain):
-        # deprecated
-        points = [self.get_xy(p) for p in points_plain]
-        min_x = min([x for x, y in points])
-        max_x = max([x for x, y in points])
-        min_y = min([y for x, y in points])
-        max_y = max([y for x, y in points])
-
-        self.boundingbox = [(max_x, min_y), (max_x, max_y), (min_x, max_y), (min_x, min_y)]
-
         # see http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
         from scipy.spatial import ConvexHull
 
