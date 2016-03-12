@@ -14,15 +14,12 @@ args = parser.parse_args()
 import numpy as np
 
 class MapReference:
-    def __init__(self, A, B):
+    def __init__(self, A, B, points_plain):
+        # make get_xy work first
         self.A = A
         self.B = B
-        # filled by orientate
-        self.angle = 0
-        self.boundingbox = [(0,0), (0,0), (0,0), (0,0)]
-        self.R = np.asarray([[1,0], [0,1]])
+        self.R = np.asarray([[1, 0], [0, 1]])
 
-    def orientate(self, points_plain):
         # see http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
         from scipy.spatial import ConvexHull
 
@@ -99,8 +96,6 @@ class MapReference:
         # TODO
         assert(self.A.lat == self.B.lat)
         return -1 * np.degrees(self.angle)
-#        return np.degrees(np.arcsin(np.linalg.norm((self.boundingbox[2][0], self.boundingbox[1][1]) - self.boundingbox[1]) / self.max_width())) - 90
-#        return -1 * np.degrees(np.arccos(self.R[0,0]))
 
     def get_xy(self, C):
         a = self.B.distance(C)
@@ -388,8 +383,7 @@ figures = kml_file.get_figures()
 all_coords = sum([figure.get_coordinates() for figure in figures], [])
 lats = [coord.lat for coord in all_coords]
 lons = [coord.lon for coord in all_coords]
-ref = MapReference(MapPoint(max(lats), min(lons)), MapPoint(max(lats), max(lons)))
-ref.orientate(all_coords)
+ref = MapReference(MapPoint(max(lats), min(lons)), MapPoint(max(lats), max(lons)), all_coords)
 
 paper = select_paper(ref, args.massstab)
 paper.render(figures, args.output)
