@@ -120,8 +120,8 @@ class MapReference:
         x = b * np.cos(alpha)
         y = b * np.sin(alpha)
 
-        refpoint = np.dot(self.boundingbox[3], self.R)
-        return tuple(np.dot([x, y], self.R) - refpoint)
+        topleft = self.boundingbox[3]
+        return tuple(np.dot(np.subtract((x, y), topleft), self.R))
 
 class MapPoint:
     def __init__(self, lat, lon):
@@ -227,7 +227,9 @@ class Paper:
         self.foldingy = foldingy
 
     def get_drawing_offset(self):
-        return (self.drawingoffsetx + (self.drawingwidth - ref.max_width() * 1000 / self.massstab) / 2, self.drawingoffsety + (self.drawingheight - ref.max_height() * 1000 / self.massstab) / 2)
+        offsetx = self.drawingoffsetx + (self.drawingwidth - ref.max_width() * 1000 / self.massstab) / 2
+        offsety = self.drawingoffsety + (self.drawingheight - ref.max_height() * 1000 / self.massstab) / 2
+        return (offsetx, offsety)
 
     def get_drawing_point(self, point):
         x, y = ref.get_xy(point)
