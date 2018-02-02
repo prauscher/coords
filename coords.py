@@ -18,6 +18,7 @@ class MapReference:
         # make get_xy work first
         self.A = A
         self.B = B
+        self.boundingbox = [(0,0), (0,0), (0,0), (0,0)]
         self.R = np.asarray([[1, 0], [0, 1]])
 
         # see http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
@@ -176,11 +177,11 @@ class KmlFile:
         return KmlPoint(coordinate, label)
 
     def parse_linestring(self, placemark, linestring):
-        coordinates = list(map(self.parse_coordinate, linestring.find("{http://www.opengis.net/kml/2.2}coordinates").text.strip().split(" ")))
+        coordinates = list(map(self.parse_coordinate, linestring.find("{http://www.opengis.net/kml/2.2}coordinates").text.split()))
         return KmlLineString(coordinates)
 
     def parse_polygon(self, placemark, polygon):
-        coordinates = list(map(self.parse_coordinate, polygon.find("{http://www.opengis.net/kml/2.2}outerBoundaryIs").find("{http://www.opengis.net/kml/2.2}LinearRing").find("{http://www.opengis.net/kml/2.2}coordinates").text.strip().split(" ")))
+        coordinates = list(map(self.parse_coordinate, polygon.find("{http://www.opengis.net/kml/2.2}outerBoundaryIs").find("{http://www.opengis.net/kml/2.2}LinearRing").find("{http://www.opengis.net/kml/2.2}coordinates").text.split()))
         return KmlPolygon(coordinates)
 
     def parse_placemark(self, placemark):
